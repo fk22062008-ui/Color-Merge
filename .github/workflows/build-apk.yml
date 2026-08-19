@@ -36,23 +36,21 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+          validate-wrappers: false
 
-      - name: Generate/refresh Gradle Wrapper
-        run: gradle wrapper --gradle-version 8.7 --distribution-type bin
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x gradlew
-
-      - name: Verify Gradle Wrapper
-        run: ./gradlew --version
+      - name: Verify installed Gradle
+        run: gradle --version
 
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
+        run: gradle :app:assembleDebug --stacktrace --no-daemon
+
+      - name: Verify debug APK exists
+        run: test -s app/build/outputs/apk/debug/app-debug.apk
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: color-merge-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
